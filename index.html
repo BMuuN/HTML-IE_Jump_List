@@ -1,0 +1,154 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+
+    <!-- Site Properties -->
+    <title>Site Pinning</title>
+    <link rel="icon" href="http://example.local/favicon.ico" type="image/x-icon" />
+
+    <meta name="application-name" content="example.local Site Pinning" />
+    <meta name="msapplication-tooltip" content="example.local Site Pinning Example" />
+    <!--<meta name="msapplication-starturl" content="http://example.local" />-->
+
+    <!-- Unused Meta Tags
+        <meta name="msapplication-window" content="width=1024;height=768" />
+    -->
+
+    <!-- Navigation Button Colour -->
+    <meta name="msapplication-navbutton-color" content="#47B74B" />
+
+    <!-- Pinned Tasks -->
+    <meta name="msapplication-task" content="name=Facebook; action-uri=http://www.facebook.com; icon-uri=http://www.facebook.com/favicon.ico" />
+    <meta name="msapplication-task" content="name=Twitter; action-uri=http://www.twitter.com; icon-uri=http://www.twitter.com/favicon.ico" />
+    <meta name="msapplication-task" content="name=YouTube; action-uri=http://www.youtube.com; icon-uri=http://www.youtube.com/favicon.ico" />
+
+    <script>
+
+        // set the overlay icon
+        function setOverlayIcon(iconUri, descText) {
+            try {
+                if (window.external.msIsSiteMode()) {
+                    window.external.msSiteModeSetIconOverlay(iconUri, descText);
+                }
+            }
+            catch (e) {
+                // die in peace please
+            }
+        }
+
+        // clear the overlay icon
+        function clearOverlayIcon() {
+            try {
+                if (window.external.msIsSiteMode()) {
+                    window.external.msSiteModeClearIconOverlay();
+                }
+            }
+            catch (e) {
+                // die in peace please
+            }
+        }
+
+        // flash the pinned window
+        function flashWindow() {
+            try {
+                if (window.external.msIsSiteMode()) {
+                    alert('Tab away from this window.');
+                    window.setTimeout("window.external.msSiteModeActivate()", 2000);
+                }
+            }
+            catch (ex) {
+                // Fail silently.
+            }
+        }
+
+        // create a dynamic jump list :- only 1 static and 1 dynamic list are allowed
+        function createDynamicJumpList() {
+            try {
+                if (window.external.msIsSiteMode()) {
+
+                    var g_ext = window.external;
+                    g_ext.msSiteModeClearJumpList();
+                    g_ext.msSiteModeCreateJumpList("Social");
+                    g_ext.msSiteModeAddJumpListItem("Facebook", "https://www.facebook.com", "http://www.facebook.com/favicon.ico");
+                    g_ext.msSiteModeAddJumpListItem("Twitter", "https://twitter.com", "http://www.twitter.com/favicon.ico");
+                    g_ext.msSiteModeAddJumpListItem("YouTube", "http://www.youtube.com", "http://www.youtube.com/favicon.ico");
+
+                    // Show updates to the Jump List.
+                    g_ext.msSiteModeShowJumplist();
+                }
+            }
+            catch (ex) {
+                // Fail silently.
+            }
+        }
+
+        // setup the click event listners
+        if (document.addEventListener) {
+            document.addEventListener('msthumbnailclick', onButtonClicked, false);
+        } else if (document.attachEvent) {
+            document.attachEvent('onmsthumbnailclick', onButtonClicked);
+        }
+
+        function onButtonClicked(btn) {
+            switch (btn.buttonID) {
+                case btnFacebook:
+                    window.location = "https://www.facebook.com";
+                    break;
+                case btnTwitter:
+                    window.location = "https://twitter.com";
+                    break;
+                case btnYouTube:
+                    window.location = "http://www.youtube.com";
+                    break;
+            }
+        }
+
+        var states = { CLEAR: 0, YOUTUBE: 1, TWITTER: 2, FACEBOOK: 3 };
+
+        // Set the icon overlay by status
+        function setStatus(status) {
+            switch (status) {
+                case states.CLEAR:
+                    clearOverlayIcon();
+                    break;
+
+                case states.YOUTUBE:
+                    setOverlayIcon('youtube.ico', 'YouTube');
+                    // setTimeout("setStatus(states.CLEAR)", 10000);
+                    break;
+
+                case states.TWITTER:
+                    setOverlayIcon('twitter.ico', 'Twitter');
+                    // setTimeout("setStatus(states.CLEAR)", 10000);
+                    break;
+
+                case states.FACEBOOK:
+                    setOverlayIcon('facebook.ico', 'Facebook');
+                    // setTimeout("setStatus(states.CLEAR)", 10000);
+                    break;
+            }
+        }
+
+        // Add hover buttons
+        btnFacebook = window.external.msSiteModeAddThumbBarButton('facebook.ico', 'Facebook');
+        btnTwitter = window.external.msSiteModeAddThumbBarButton('twitter.ico', 'Twitter');
+        btnYouTube = window.external.msSiteModeAddThumbBarButton('youtube.ico', 'YouTube');
+        window.external.msSiteModeShowThumbBar();
+
+        // set the overlay
+        setStatus(states.TWITTER);
+
+        createDynamicJumpList();
+
+    </script>
+
+</head>
+<body>
+    <h1>Site Pinning Example</h1>
+    <p>
+        Pin the site to the Windows Taskbar and right click the shortcut to access the menu.
+    </p>
+</body>
+</html>
